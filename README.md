@@ -1,6 +1,22 @@
-## GES 
+# GES 
 
-go-echo-skeleton
+## go-echo-skeleton 脚手架工具
 
-[来源]：[https://github.com/go-eagle/eagle/tree/master/cmd/eagle](https://github.com/go-eagle/eagle/tree/master/cmd/eagle)
+### 使用
+
+下载
+
+```bash
+    go install githgithub.com/wzhanjun/ges@latest
+```
+
+创建项目
+
+```bash
+    ges new helloworld
+```
+
+### 来源：
+
+[https://github.com/go-eagle/eagle/tree/master/cmd/eagle](https://github.com/go-eagle/eagle/tree/master/cmd/eagle)
 
