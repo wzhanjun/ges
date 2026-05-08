@@ -14,17 +14,19 @@ var unExpandVarPath = []string{"~", ".", ".."}
 
 // Repo is git repository manager.
 type Repo struct {
-	url    string
-	branch string
-	home   string
+	url   string
+	ref   string
+	isTag bool
+	home  string
 }
 
 // NewRepo new a repository manager.
-func NewRepo(url string, branch string) *Repo {
+func NewRepo(url string, ref string, isTag bool) *Repo {
 	return &Repo{
-		url:    url,
-		branch: branch,
-		home:   GESHomeWithDir("repo/" + repoDir(url)),
+		url:   url,
+		ref:   ref,
+		isTag: isTag,
+		home:  GESHomeWithDir("repo/" + repoDir(url)),
 	}
 }
 
@@ -34,21 +36,31 @@ func (r *Repo) Path() string {
 	if end == -1 {
 		end = len(r.url)
 	}
-	var branch string
-	if r.branch == "" {
-		branch = "@main"
-	} else {
-		branch = "@" + r.branch
+	ref := r.ref
+	if ref == "" {
+		ref = "main"
 	}
-	return path.Join(r.home, r.url[start+1:end]+branch)
+	return path.Join(r.home, r.url[start+1:end]+"@"+ref)
 }
 
 // Pull fetch the repository from remote url.
 func (r *Repo) Pull(ctx context.Context) error {
+	if r.isTag {
+		cmd := exec.CommandContext(ctx, "git", "fetch", "--tags", "origin")
+		cmd.Dir = r.Path()
+		if out, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("git fetch failed: %s, %w", string(out), err)
+		}
+		cmd = exec.CommandContext(ctx, "git", "checkout", r.ref)
+		cmd.Dir = r.Path()
+		if out, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("git checkout failed: %s, %w", string(out), err)
+		}
+		return nil
+	}
 	cmd := exec.CommandContext(ctx, "git", "symbolic-ref", "HEAD")
 	cmd.Dir = r.Path()
-	_, err := cmd.CombinedOutput()
-	if err != nil {
+	if _, err := cmd.CombinedOutput(); err != nil {
 		return err
 	}
 	cmd = exec.CommandContext(ctx, "git", "pull")
@@ -67,10 +79,10 @@ func (r *Repo) Clone(ctx context.Context) error {
 		return r.Pull(ctx)
 	}
 	var cmd *exec.Cmd
-	if r.branch == "" {
+	if r.ref == "" {
 		cmd = exec.CommandContext(ctx, "git", "clone", r.url, r.Path())
 	} else {
-		cmd = exec.CommandContext(ctx, "git", "clone", "-b", r.branch, r.url, r.Path())
+		cmd = exec.CommandContext(ctx, "git", "clone", "-b", r.ref, r.url, r.Path())
 	}
 
 	out, err := cmd.CombinedOutput()

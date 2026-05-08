@@ -22,6 +22,7 @@ var CmdNew = &cobra.Command{
 var (
 	repoURL string
 	branch  string
+	tag     string
 	timeout string
 )
 
@@ -37,6 +38,7 @@ func init() {
 
 	CmdNew.Flags().StringVarP(&repoURL, "repo-url", "r", repoURL, "layout repo")
 	CmdNew.Flags().StringVarP(&branch, "branch", "b", branch, "default is main branch")
+	CmdNew.Flags().StringVarP(&tag, "tag", "", "", "specify a tag version (e.g. v1.0.0)")
 	CmdNew.Flags().StringVarP(&timeout, "timeout", "t", timeout, "request timeout time")
 }
 
@@ -71,7 +73,7 @@ func run(cmd *cobra.Command, args []string) {
 	p := &Project{Name: name}
 	done := make(chan error, 1)
 	go func() {
-		done <- p.New(ctx, wd, repoURL, branch)
+		done <- p.New(ctx, wd, repoURL, branch, tag)
 	}()
 
 	select {
