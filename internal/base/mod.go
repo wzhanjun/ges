@@ -3,6 +3,8 @@ package base
 import (
 	"bufio"
 	"bytes"
+	"errors"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -31,6 +33,9 @@ func ModuleVersion(path string) (string, error) {
 	rd := bufio.NewReader(stdout)
 	for {
 		line, _, err := rd.ReadLine()
+		if errors.Is(err, io.EOF) {
+			break
+		}
 		if err != nil {
 			return "", err
 		}
@@ -40,4 +45,5 @@ func ModuleVersion(path string) (string, error) {
 			return path + str[i:], nil
 		}
 	}
+	return "", errors.New("module not found in mod graph")
 }

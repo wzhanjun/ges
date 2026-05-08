@@ -2,6 +2,7 @@ package project
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -31,7 +32,7 @@ func (p *Project) New(ctx context.Context, dir string, layout string, branch str
 			return e
 		}
 		if !override {
-			return err
+			return errors.New("project creation cancelled by user")
 		}
 		e = os.RemoveAll(to)
 		if e != nil {
@@ -53,6 +54,7 @@ func (p *Project) New(ctx context.Context, dir string, layout string, branch str
 	//if e != nil {
 	//	return e
 	//}
+
 	base.Tree(to, dir)
 
 	fmt.Printf("\n🍺 Project creation succeeded %s\n", color.GreenString(p.Name))
@@ -60,7 +62,7 @@ func (p *Project) New(ctx context.Context, dir string, layout string, branch str
 
 	fmt.Println(color.WhiteString("$ cd %s", p.Name))
 	fmt.Println(color.WhiteString("$ make run\n"))
-	fmt.Println("🤝 Thanks for using Eagle")
+	fmt.Println("🤝 Thanks for using GES")
 	fmt.Println("📚 Tutorial: https://github.com/wzhanjun/ges")
 	return nil
 }

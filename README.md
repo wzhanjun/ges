@@ -7,7 +7,7 @@
 下载
 
 ```bash
-    go install githgithub.com/wzhanjun/ges@latest
+    go install github.com/wzhanjun/ges@latest
 ```
 
 创建项目
