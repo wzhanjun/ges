@@ -9,7 +9,7 @@ import (
 
 var (
 	// Version is the version of the compiled software.
-	Version = "v1.0.0"
+	Version = "v0.0.3"
 
 	rootCmd = &cobra.Command{
 		Use:     "ges",
